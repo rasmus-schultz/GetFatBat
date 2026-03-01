@@ -17,17 +17,19 @@ export default function Game() {
   const MapRatio = "3/1.5";
   const BatHeightPerSec = 0.5;
   const ScanHeightPerSec = 1;
-  const ScanLife = 3;
-  const ScanCooldown = 2;
+  const ScanLife = 5;
+  const ScanCooldown = 1.5;
   const BatScale = 3;
   const BugScale = 2;
   const MothScale = 8;
-  const MothDisplay = 1;
+  const MothDisplay = 0.25;
+  const MothHeightPerSec = 3;
   const GameTime = 180;
   const WingStep = 0.125;
   const WingPause = 0.25;
 
   // START VALUES [
+  const MothDestination = MothScale + 100;
   const [Scans, setScans] = useState([]);
   const [Moths, setMoths] = useState([]);
   const [ViewSize, setViewSize] = useState({ W: 0, H: 0 });
@@ -294,13 +296,18 @@ export default function Game() {
 
         // MOTH SPRITE [
         const SpawnPos = { ...BugPosRef.current };
+        const Distance = MothDestination - SpawnPos.Y * 100;
+        const MoveTime = Distance / (100 / MothHeightPerSec);
         setMoths((OldMoths) => [
           ...OldMoths,
           {
             ID: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
             X: SpawnPos.X,
             Y: SpawnPos.Y,
-            LifeLeft: MothDisplay,
+            MoveTime: MoveTime,
+            LifeLeft: MothDisplay + MoveTime,
+            Movement: 0,
+            Ready: false,
           },
         ]);
         // ] MOTH SPRITE
@@ -309,6 +316,9 @@ export default function Game() {
         const Pos = getRandomPos(BugScale);
         BugPosRef.current = Pos;
         setBugPos(Pos);
+
+        // Play bite sound.
+        playSound("bite");
 
         // Give point.
         setPoints((Current) => Current + 1);
@@ -325,12 +335,28 @@ export default function Game() {
         let hasChanged = false;
         const NewMoths = OldMoths.map((MothObj) => {
           const LifeLeft = Math.max(0, MothObj.LifeLeft - Delta);
+          const MoveTime = MothObj.MoveTime;
+          let Movement = MothObj.Movement;
+          let Ready = MothObj.Ready;
 
           if (LifeLeft !== MothObj.LifeLeft) {
             hasChanged = true;
           }
 
-          return { ...MothObj, LifeLeft };
+          if (Ready == true && Movement == 0) {
+            Movement = 1;
+            hasChanged = true;
+          }
+          if (Ready == false) {
+            Ready = true;
+            hasChanged = true;
+          }
+
+          if (LifeLeft <= MoveTime && Movement != 2) {
+            Movement = 2;
+          }
+
+          return { ...MothObj, LifeLeft, Movement, Ready };
         }).filter((MothObj) => MothObj.LifeLeft > 0);
 
         if (NewMoths.length !== OldMoths.length) hasChanged = true;
@@ -462,7 +488,7 @@ export default function Game() {
               key={Scan.ID}
               className={cl(styles, `scan ${Scan.Fading ? "fading" : ""}`)}
               style={{
-                transition: `height ${Scan.GrowLeft}s linear, opacity ${ScanLife}s`,
+                transition: `height ${Scan.InitialGrowLeft}s linear, opacity ${ScanLife}s`,
                 left: `${Scan.X * 100}%`,
                 top: `${Scan.Y * 100}%`,
                 height: `${Scan.Ready ? Scan.Radius * 200 : 0}%`,
@@ -485,8 +511,15 @@ export default function Game() {
               key={Moth.ID}
               className={cl(styles, "moth")}
               style={{
+                transition: `top ${Moth.Movement === 2 ? Moth.MoveTime : MothDisplay}s ${Moth.Movement === 2 ? "ease-in" : "ease-out"}`,
                 left: `${Moth.X * 100}%`,
-                top: `${Moth.Y * 100}%`,
+                top: `${
+                  Moth.Movement === 0
+                    ? Moth.Y * 100
+                    : Moth.Movement === 1
+                      ? Moth.Y * 100 - MothScale
+                      : MothDestination
+                }%`,
                 height: `${MothScale}%`,
               }}
             />

@@ -19,6 +19,7 @@
   background-size: cover;
   background-position: center;
   image-rendering: pixelated;
+  overflow: hidden;
 }
 
 .bug {
@@ -29,7 +30,7 @@
 
   border-radius: 1em;
   background: rgb(255, 217, 0);
-  opacity: 1;
+  opacity: 0;
 }
 .moth {
   position: absolute;
