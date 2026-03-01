@@ -9,6 +9,7 @@ import { moveMap } from "../../functions/WorldFunctions";
 import { makeScan } from "../../functions/WorldFunctions";
 import { getRandomPos, testTouch } from "../../functions/BugFunctions";
 import { addScore } from "../../functions/Scores";
+import { playSound } from "../../functions/SoundManager";
 
 export default function Game() {
   // Set input variables.
@@ -21,8 +22,7 @@ export default function Game() {
   const BatScale = 3;
   const BugScale = 2;
   const MothScale = 8;
-  const MothDisplay = 0.5;
-  const MothMove = 0.375;
+  const MothDisplay = 1;
   const GameTime = 180;
   const WingStep = 0.125;
   const WingPause = 0.25;
@@ -293,24 +293,14 @@ export default function Game() {
         hasTouched.current = true;
 
         // MOTH SPRITE [
-        // Get rendered elements.
-        const BugElm = BugElmRef.current.getBoundingClientRect();
-        const ViewportElm = ViewportRef.current.getBoundingClientRect();
-        // Get centre position of bug. (Default is top-left corner.)
-        const BugPosX = BugElm.left + BugElm.width / 2;
-        const BugPosY = BugElm.top + BugElm.height / 2;
-        // Get bug centre's distance from top and left of viewport.
-        const ViewX = (BugPosX - ViewportElm.left) / ViewportElm.width;
-        const ViewY = (BugPosY - ViewportElm.top) / ViewportElm.height;
-        // Create new moth.
+        const SpawnPos = { ...BugPosRef.current };
         setMoths((OldMoths) => [
           ...OldMoths,
           {
             ID: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
-            X: ViewX,
-            Y: ViewY,
-            LifeLeft: MothDisplay + MothMove,
-            Moving: 0,
+            X: SpawnPos.X,
+            Y: SpawnPos.Y,
+            LifeLeft: MothDisplay,
           },
         ]);
         // ] MOTH SPRITE
@@ -336,16 +326,11 @@ export default function Game() {
         const NewMoths = OldMoths.map((MothObj) => {
           const LifeLeft = Math.max(0, MothObj.LifeLeft - Delta);
 
-          let Moving = MothObj.Moving;
-          if (Moving == 0 && LifeLeft <= MothMove) {
-            Moving = 1;
-          }
-
           if (LifeLeft !== MothObj.LifeLeft) {
             hasChanged = true;
           }
 
-          return { ...MothObj, LifeLeft, Moving };
+          return { ...MothObj, LifeLeft };
         }).filter((MothObj) => MothObj.LifeLeft > 0);
 
         if (NewMoths.length !== OldMoths.length) hasChanged = true;
@@ -370,6 +355,7 @@ export default function Game() {
           NextFrame = 0;
           WingDirRef.current = 1;
           WingTimerRef.current = WingPause;
+          playSound("flap");
         } else {
           WingTimerRef.current = WingStep;
         }
@@ -445,19 +431,6 @@ export default function Game() {
           {Minutes}:{Seconds}
         </div>
 
-        {Moths.map((Moth) => (
-          <div
-            key={Moth.ID}
-            className={cl(styles, "moth")}
-            style={{
-              transition: `left ${MothMove}s linear, top ${MothMove}s linear`,
-              left: `${Moth.Moving == 0 ? Moth.X * 100 : 0}%`,
-              top: `${Moth.Moving == 0 ? Moth.Y * 100 : 0}%`,
-              height: `${MothScale}%`,
-            }}
-          />
-        ))}
-
         <div
           className={cl(styles, "map")}
           style={{
@@ -506,6 +479,19 @@ export default function Game() {
               height: `${BugScale}%`,
             }}
           />
+
+          {Moths.map((Moth) => (
+            <div
+              key={Moth.ID}
+              className={cl(styles, "moth")}
+              style={{
+                left: `${Moth.X * 100}%`,
+                top: `${Moth.Y * 100}%`,
+                height: `${MothScale}%`,
+              }}
+            />
+          ))}
+
           <div
             className={cl(styles, "bat")}
             style={{

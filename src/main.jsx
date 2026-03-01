@@ -17,6 +17,7 @@ import Menu from "./pages/Menu/Menu";
 import Game from "./pages/Game/Game";
 import End from "./pages/End/End";
 
+
 // Define global page layout.
 function AppLayout() {
   return (
