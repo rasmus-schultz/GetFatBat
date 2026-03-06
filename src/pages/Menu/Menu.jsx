@@ -8,17 +8,20 @@ export default function Menu() {
 
   return (
     <div className={cl(styles, "main")}>
-      <h1 className={cl(styles, "title")}>Get Fat, Bat!</h1>
-      <p>Move: WASD / Arrow keys</p>
-      <p>Echo-locate: Spacebar</p>
-      <div className={cl(styles, "menu")}>
-        <Button content={"PLAY"} link={"/game"} ms={"play"} />
+      <h1 className={cl(styles, "title", "box")}>Get Fat, Bat!</h1>
+      <p className={styles.text}>Move: WASD / Arrow keys</p>
+      <p className={styles.text}>Echo-locate: Spacebar</p>
+      <div className={cl(styles, "menu", "box")}>
+        <Button content={"PLAY"} link={"/game"} gs={"boxSecond button"} />
 
         <h2 className={cl(styles, "scores")}>Previous Scores</h2>
-        <ul className={cl(styles, "list")}>
+        <ul className={cl(styles, "list", "boxSecond")}>
           {Scores.map((Score, Index) => (
-            <li key={Index}>
-              Points: {Score.points} <br /> Date: {Score.date}
+            <li className={styles.listItem} key={Index}>
+              <p>Points: {Score.points}</p>
+              <p>
+                Date: <br /> {Score.date}
+              </p>
             </li>
           ))}
         </ul>

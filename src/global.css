@@ -14,3 +14,24 @@
   container-type: size;
   user-select: none;
 }
+
+.box {
+  border-radius: 12px;
+  background-color: rgb(182, 135, 73);
+  border: 4px solid rgb(102, 77, 54);
+  color: rgb(51, 30, 4);
+  padding: 4px;
+}
+
+.boxSecond {
+  border-radius: 12px;
+  background-color: rgb(199, 173, 142);
+  border: 4px solid rgb(102, 77, 54);
+  color: rgb(51, 30, 4);
+  padding: 4px;
+}
+
+.button:hover{
+  background-color: rgb(255, 255, 255);
+  border-color: black;
+}

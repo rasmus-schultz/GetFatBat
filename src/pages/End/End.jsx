@@ -15,9 +15,11 @@ export default function End() {
   }, []);
 
   return (
-    <div className={cl(styles, "main", "setCentre")}>
-      <div>YOUR SCORE: {Scores[0].points}</div>
-      <Button content={"Return"} link={"/"} />
+    <div className={cl(styles, "main")}>
+      <div className={cl(styles, "menu", "box setCentre")}>
+        <div>YOUR SCORE: {Scores[0].points}</div>
+        <Button content={"Return"} link={"/"} gs={"boxSecond button"} />
+      </div>
     </div>
   );
 }

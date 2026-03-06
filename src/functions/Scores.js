@@ -1,5 +1,5 @@
 const Key = "scores";
-const MaxScores = 5;
+const MaxScores = 20;
 
 function getDate() {
   const doPad = (Input) => String(Input).padStart(2, "0");
