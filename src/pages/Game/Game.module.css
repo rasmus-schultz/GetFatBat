@@ -21,6 +21,9 @@
   image-rendering: pixelated;
   overflow: hidden;
 }
+.points, .timer {
+font-size: 24px;
+}
 
 .bug {
   position: absolute;
