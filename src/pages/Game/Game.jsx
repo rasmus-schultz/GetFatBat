@@ -481,6 +481,7 @@ export default function Game() {
             <div className={cl(styles, "bat-wings-mid")} />
             <div className={cl(styles, "bat-wings-up")} />
             <div className={cl(styles, "bat-torso")} />
+            <div className={cl(styles, "moth")} />
           </div>
 
           {Scans.map((Scan) => (
